@@ -1,0 +1,40 @@
+{% extends 'main/layout.html' %}
+{% load static %} 
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center mb-4">Ваш профиль</h1>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Добро пожаловать, {{ user.username }}!</h3>
+                    {% if user.client.get_profile_image_url %}
+                        <img src="{% static user.client.get_profile_image_url|cut:'/main/static/' %}" alt="Профильное изображение" class="img-fluid rounded-circle mb-3" style="width: 150px; height:150px">
+                    {% else %}
+                        <img src="{% static 'main/img/profile_img/default_profile_image.png' %}" alt="Профильное изображение" class="img-fluid rounded-circle mb-3" style="width: 150px; height:150px">
+                    {% endif %}
+                    <p class="card-text">Имя: {{ user.first_name }}</p>
+                    <p class="card-text">Фамилия: {{ user.last_name }}</p>
+                    {% if user.client.second_name %}
+                    <p class="card-text">Отчество: {{ user.client.second_name }}</p>
+                    {% endif %}
+                    <p class="card-text">Номер телефона: {{ user.client.phone_number }}</p>
+                    <p class="card-text">Пол: {{ user.client.gender }}</p>
+                    <h4 class="mt-4">Лайкнутые книги:</h4>
+                    <ul class="list-group">
+                        {% for book in liked_books %}
+                            <li class="card mb-3"><a href="{% url 'BooksDetail' pk=book.book__id %}" class="text-decoration-none btn btn-login fw-bold text-uppercase">{{ book.book__title }}</a></li>
+                        {% empty %}
+                            <li class="card mb-3">Нет лайкнутых книг</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'user_logout' %}" class="btn btn-danger bt-4">Выйти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'main/layout.html' %}
+{% load static %} 
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="px-0 col-md-6 card custom-card">
+            <div class="d-flex justify-content-center">
+                {% if book.image %}
+                <img src="{% static book.image.url|cut:'/main/static/' %}" class="card-img-top" alt="Изображение книги" style="max-width: 200px;">
+                {% else %}
+                <img src="{% static 'main/img/default_book_image.webp' %}" class="card-img-top" alt="Изображение книги" style="max-width: 200px;">
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title mb-4">{{ book.title }}</h5>
+                <h6 class="card-subtitle mb-2">{{ 'Автор: '|add:book.author }}</h6>
+                {% if book.publisher %}
+                <p class="card-text">{{ 'Издатель: ' }}{{ book.publisher }}</p>
+                {% endif %}
+                {% if book.published_date %}
+                <p class="card-text">{{ 'Дата издания: ' }}{{ book.published_date }}</p>
+                {% endif %}
+                <p class="card-text">{{ 'Описание: '|add:book.description }}</p>
+                {% if book.date %}
+                <p class="card-text">{{ 'Дата публикации: ' }}{{ book.date }}</p>
+                {% endif %}
+                <div class="d-flex justify-content-between mt-4">
+                    {% if user.is_superuser %}
+                    <form action="{% url 'deleteBook' book.id %}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить эту книгу?');">
+                        {% csrf_token %}
+                        <a href="{% url 'editBook' book.id %}" class="btn btn-reg fw-bold text-uppercase">Редактировать</a>
+                        <button type="submit" class="btn btn-reg fw-bold text-uppercase">Удалить</button>
+                    </form>
+                    {% endif %}
+                    <a href="{% url 'home' %}" class="btn btn-reg fw-bold text-uppercase">Вернуться</a>
+                </div>
+                <div class="row mt-4">
+                    <div class='d-flex align-items-center ps-1'>
+                        {% if user.is_authenticated %}
+                        <form action="{% url 'toggleLike' book.pk %}" method="post" class="d-flex ">
+                            {% csrf_token %}
+                            {% if liked %}
+                            <button type="submit" class="btn btn-reg fw-bold text-uppercase mx-2 py-2" style="min-width: 86.36px;">Unlike</button>
+                            {% else %}
+                            <button type="submit" class="btn btn-reg fw-bold text-uppercase mx-2 py-2" style="min-width: 86.36px;">Like</button>
+                            {% endif %}
+                            <span class='fw-bold fs-5 gradient-all mx-2 py-1'>Лайков: {{ book.like_set.count }}</span>
+                        </form>
+                        {% else %}
+                    </div>
+                    <div class='col-md-6'>
+                        <span class='fw-bold fs-5 gradient-all'>Лайков: {{ book.like_set.count }}</span>
+                    </div>
+                    {% endif %}
+                </div>                
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-4 px-4">
+        <div class="col-md-6 px-4">
+            <h5>Комментарии</h5>
+            {% for comment in comments %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p class="card-text">{{ comment.content }}</p>
+                        <footer class="blockquote-footer">{{ comment.user.username }} <cite title="Source Title">{{ comment.created_at }}</cite></footer>
+                    </div>
+                </div>
+            {% empty %}
+            <p>Пока нет комментариев.</p>
+            {% endfor %}
+            {% if user.is_authenticated %}
+            <div class="row justify-content-center mt-4 card-custom">
+                <div>
+                    <h5>Добавить комментарий</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-reg fw-bold text-uppercase">Отправить</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center ">
+                <p class='fw-bold fs-4 gradient-all'>Чтобы добавлять комментарии и ставить лайки сначала авторизируйесь</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

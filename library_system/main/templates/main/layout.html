@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"/>  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "main/css/main.css" %}">
+    <link rel="icon" href="{% static "main/img/favicon.ico" %}" type="image/x-icon">
+</head>
+    <body>
+        <header class="p-3 bg-dark text-white">
+            <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                    <span class="text-uppercase fw-bold fs-4 mx-3 gradient-all title-logo">Biblioteka</span>
+                </a>
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 ">
+                    <li><a href="{% url "home" %}" class="nav-link fs-5 px-2 text-white nav__link">Главная</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url "addBook" %}" class="nav-link px-2 fs-5 text-white nav__link">Добавить книгу</a></li>
+                    {% endif %}
+                    <li><a href="{% url "about" %}" class="nav-link px-2 fs-5 text-white nav__link">О сайте</a></li>
+                </ul>
+                <div class="text-end">
+                    {% if user.is_superuser %}
+                    <a href="/admin" class="btn me-2 btn-login fw-bold text-uppercase">Администрация</a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="btn me-2 btn-login fw-bold text-uppercase">Профиль</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn me-2 btn-login fw-bold text-uppercase">Войти</a>
+                        <a href="{% url 'registration' %}" class="btn btn-reg fw-bold text-uppercase">Зарегистрироваться</a>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+        </header>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <footer class='bg-dark p-3 mt-4'>
+        </footer>
+    </body>
+</html>

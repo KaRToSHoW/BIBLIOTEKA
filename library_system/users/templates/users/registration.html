@@ -1,0 +1,27 @@
+{% extends "main/layout.html" %}
+{% load static %}
+{% block title %}Регестрация{% endblock %}
+{% block content %}
+<div class='container mx-auto mt-4 card col-md-4 text-center p-4 bg-dark gradient-border' >
+    <div class="form-body">
+        <div class="row">
+            <div class="form-holder">
+                <div class="form-content">
+                    <div class="form-items">
+                        <h3 class="text-gradient text-uppercase">Регестрация</h3>
+                        <form class="requires-validation" method='post'>
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <div class="form-button mt-3">
+                                <button id="submit" type="submit" class="btn btn-login fw-bold text-uppercase">Зарегестрироваться</button>
+                            </div>
+                            <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
