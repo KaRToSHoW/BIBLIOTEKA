@@ -13,7 +13,7 @@ class ImageOptionModelTest(TestCase):
 
     def test_image_option_creation(self):
         self.assertTrue(self.image_option.image)
-    
+
     def test_image_option_str(self):
         self.assertEqual(str(self.image_option), f"Image {self.image_option.pk}")
 

@@ -26,7 +26,20 @@
                     <li><a href="{% url "addBook" %}" class="nav-link px-2 fs-5 text-white nav__link">Добавить книгу</a></li>
                     {% endif %}
                     <li><a href="{% url "about" %}" class="nav-link px-2 fs-5 text-white nav__link">О сайте</a></li>
+                    <li class="justify-content-center">
+                        <!-- Форма поиска -->
+                        <form method="get" action="{% url 'home' %}" class="d-flex requires-validation">
+                            <input 
+                                type="text" 
+                                name="q" 
+                                class="form-control me-2" 
+                                placeholder="Введите название или описание книги..." 
+                                value="{{ query|default:'' }}">
+                            <button type="submit" class="btn btn-login fw-bold text-uppercase">Поиск</button>
+                        </form>
+                    </li>
                 </ul>
+                
                 <div class="text-end">
                     {% if user.is_superuser %}
                     <a href="/admin" class="btn me-2 btn-login fw-bold text-uppercase">Администрация</a>

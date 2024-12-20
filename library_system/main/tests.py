@@ -10,7 +10,7 @@ class GenreModelTest(TestCase):
     def test_genre_creation(self):
         self.assertEqual(self.genre.name, "Fiction")
         self.assertIsInstance(self.genre.created_at, timezone.datetime)
-    
+
     def test_genre_str(self):
         self.assertEqual(str(self.genre), "Fiction")
 

@@ -27,6 +27,14 @@
                 {% if book.date %}
                 <p class="card-text">{{ 'Дата публикации: ' }}{{ book.date }}</p>
                 {% endif %}
+                <p>Жанры:</p>
+                <ul>
+                    {% for genre in book.genres.all %}
+                        <li>{{ genre.name }}</li>
+                    {% empty %}
+                        <li>Нет жанров</li>
+                    {% endfor %}
+                </ul>
                 <div class="d-flex justify-content-between mt-4">
                     {% if user.is_superuser %}
                     <form action="{% url 'deleteBook' book.id %}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить эту книгу?');">

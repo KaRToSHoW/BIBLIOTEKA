@@ -1,17 +1,21 @@
 from django.db import models
+from django.forms import ValidationError
 from django.utils import timezone
 from django.contrib.auth.models import User
+from simple_history.models import HistoricalRecords
 
 class Genre(models.Model):
     name = models.CharField('Жанр', max_length=100)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    
+    history = HistoricalRecords()
+
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-        
+
     def __str__(self):
         return self.name
+
 
 class Book(models.Model):
     title = models.CharField('Название книги', max_length=200)
@@ -23,6 +27,7 @@ class Book(models.Model):
     date = models.DateTimeField('Дата добавления', default=timezone.now)
     image = models.FileField('Фото для обложки', upload_to='main/static/main/img', null=True, blank=True)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = 'Книга'
@@ -35,6 +40,16 @@ class Book(models.Model):
         return self.like_set.count()
 
     likes_count.short_description = 'Количество лайков'
+
+    def clean(self):
+        """Валидация перед сохранением."""
+        # Проверка, чтобы дата издания не была в будущем
+        if self.published_date and self.published_date > timezone.now().date():
+            raise ValidationError({'published_date': 'Дата издания не может быть в будущем.'})
+
+        # Проверка на уникальность по названию
+        if Book.objects.filter(title=self.title).exists():
+            raise ValidationError({'title': 'Книга с таким названием уже существует.'})
 
 
 class Comment(models.Model):
@@ -60,3 +75,6 @@ class Like(models.Model):
         verbose_name = 'Лайк'
         verbose_name_plural = 'Лайки'
         unique_together = ('user', 'book')
+
+    def __str__(self):
+        return f"Лайк от {self.user.username} на книгу {self.book.title}"

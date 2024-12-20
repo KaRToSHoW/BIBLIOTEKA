@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
 
 class ImageOption(models.Model):
     image = models.ImageField(upload_to='main/static/main/img/profile_img', verbose_name="Доступное изображение")
@@ -18,13 +17,13 @@ class Client(models.Model):
         ('F', 'Женский'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=15, verbose_name="Телефон", null=True)
-    first_name = models.CharField(max_length=128, verbose_name="Имя", null=True)
-    last_name = models.CharField(max_length=128, verbose_name="Фамилия", null=True)
-    second_name = models.CharField(max_length=128, verbose_name="Отчество", null=True, blank=True)
+    phone_number = models.CharField(max_length=15, verbose_name="Телефон", blank=True)
+    first_name = models.CharField(max_length=128, verbose_name="Имя", blank=True)
+    last_name = models.CharField(max_length=128, verbose_name="Фамилия", blank=True)
+    second_name = models.CharField(max_length=128, verbose_name="Отчество", blank=True)
     birth_date = models.DateField(null=True, verbose_name="Дата рождения", blank=True)
-    gender = models.CharField(max_length=1, verbose_name="Пол", choices=GENDER_CHOICES, null=True)
-    profile_image = models.ForeignKey(ImageOption, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Изображение профиля")
+    gender = models.CharField(max_length=1, verbose_name="Пол", choices=GENDER_CHOICES, blank=True)
+    profile_image = models.ForeignKey(ImageOption, on_delete=models.SET_NULL, null=True, verbose_name="Изображение профиля")
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:

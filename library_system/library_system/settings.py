@@ -33,18 +33,22 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'main',
     'users',
-    'debug_toolbar', #DEBUG
+    'debug_toolbar',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'simple_history',
+    'import_export',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware', #DEBUG
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'library_system.urls'
@@ -140,3 +145,9 @@ LOGOUT_REDIRECT_URL = '/'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}

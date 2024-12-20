@@ -5,12 +5,38 @@
 
 
 {% block content %}
-{% if books %}
-<div class="container mx-auto mt-4 d-felx">
+<div class="container mx-auto mt-4">
+    <!-- Форма поиска и фильтрации -->
+    <form method="get" action="{% url 'home' %}" class="d-flex mb-4">
+        <!-- Выпадающий список фильтров -->
+        <select name="filter" class="form-select me-2 mb-2">
+            <option value="" {% if not filter_by %}selected{% endif %}>Все</option>
+            <option value="author" {% if filter_by == "author" %}selected{% endif %}>По автору</option>
+            <option value="date" {% if filter_by == "date" %}selected{% endif %}>По дате добавления</option>
+            <option value="publisher" {% if filter_by == "publisher" %}selected{% endif %}>По издателю</option>
+            <option value="likes" {% if filter_by == "likes" %}selected{% endif %}>По лайкам</option>
+        </select>
+        <!-- Фильтр по жанру -->
+        <select name="genre" class="form-select me-2 mb-2">
+            <option value="" {% if not selected_genre %}selected{% endif %}>Все жанры</option>
+            {% for genre in genres %}
+            <option value="{{ genre.id }}" {% if genre.id|stringformat:"s" == selected_genre %}selected{% endif %}>
+                {{ genre.name }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <!-- Кнопка поиска -->
+        <button type="submit" class="btn btn-login fw-bold text-uppercase">Применить</button>
+    </form>
+</div>
+
+{% if page_obj %}
+<div class="container mx-auto mt-4 d-flex">
     <div class="row">
-        {% for book in books %}
+        {% for book in page_obj %}
         <div class="col-md-4">
-            <div class="card" style="width: 20.2rem;min-height: 700px;">
+            <div class="card" style="width: 20.2rem; min-height: 700px;">
                 <div class="d-flex justify-content-center">
                     {% if book.image %}
                         <img src="{% static book.image.url|cut:'/main/static/' %}" class="card-img-top" alt="Изображение книги" style="max-width: 250px;">
@@ -21,27 +47,62 @@
                 <div class="card-body d-flex flex-column">
                     <div class="mb-4">
                         <h5 class="card-title mb-4">{{ book.title }}</h5>
-                        <h6 class="card-subtitle mb-2 ">{{ 'Автор: '|add:book.author }}</h6>
+                        <h6 class="card-subtitle mb-2">{{ 'Автор: '|add:book.author }}</h6>
                         <p class="card-text">{{ 'Описание: '|add:book.description|truncatewords:15 }}</p>
                     </div>
                     <div class="mt-auto">
-                        {% if book.date %}
-                        <p class="card-text">{{ 'Дата публикации: ' }}{{ book.date }}</p>
+                        {% if book.published_date %}
+                        <p class="card-text">{{ 'Дата публикации: ' }}{{ book.published_date }}</p>
                         {% endif %}
-                        <a href="{% url "BooksDetail" book.pk %}" class="btn btn-reg fw-bold text-uppercase">Подробнее</a>
+                        <a href="{% url 'BooksDetail' book.pk %}" class="btn btn-reg fw-bold text-uppercase">Подробнее</a>
                     </div>
                 </div>
-                
             </div>
-        </div>  
+        </div>
         {% endfor %}
     </div>
-</div> 
+</div>
+
+<!-- Блок пагинации -->
+<div class="container mx-auto mt-4 d-flex justify-content-center">
+    <nav aria-label="Навигация по страницам">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link fw-bold text-uppercase gradient-page" href="?page={{ page_obj.previous_page_number }}" aria-label="Предыдущая">
+                    &laquo;
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link fw-bold gradient-background">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link fw-bold text-uppercase gradient-page" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link fw-bold text-uppercase gradient-page" href="?page={{ page_obj.next_page_number }}" aria-label="Следующая">
+                    &raquo;
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 {% else %}
 <div class="container mx-auto mt-4 card col-md-4 text-center p-5">
-    <p class='text-uppercase fw-bold fs-4 gradient-all'>Тут пока ничего нет</p>
-    <a href="{% url "addBook" %}" class="btn btn-login fw-bold text-uppercase">Добавить книгу</a>
+    <p class="text-uppercase fw-bold fs-4 ">Тут пока ничего нет</p>
+    <a href="{% url 'addBook' %}" class="btn btn-login fw-bold text-uppercase">Добавить книгу</a>
 </div>
 {% endif %}
+
 {% endblock %}
 

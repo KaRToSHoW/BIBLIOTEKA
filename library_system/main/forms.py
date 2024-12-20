@@ -17,7 +17,7 @@ class BookForm(ModelForm):
             'image': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': 'image/*',
-            }), 
+            }),
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Название книги*',
@@ -37,13 +37,13 @@ class BookForm(ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Описание*',
                 'required': 'required',
-                'rows': 3, 
+                'rows': 3,
             }),
             'published_date': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date',
                 'placeholder': 'Дата издания*',
-            }),  
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -100,7 +100,7 @@ class BookFormEdit(ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Описание*',
                 'required': 'required',
-                'rows': 3, 
+                'rows': 3,
             }),
         }
 

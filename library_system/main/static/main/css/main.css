@@ -49,8 +49,21 @@ footer {
     background: var(--gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    border: 0;
 }
-
+.page-link{
+    border-color: var(--gradient) !important;
+}
+.gradient-background {
+    background: var(--gradient);
+}
+.gradient-page{
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border-image: var(--gradient);
+    border-image-slice: 1;
+}
 .gradient-all {
     background: var(--gradient);
     -webkit-background-clip: text;

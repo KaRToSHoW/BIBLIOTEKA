@@ -53,7 +53,7 @@ class ClientForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username',  'last_name', 'first_name',  'second_name','email', 'phone_number', 'birth_date', 'gender', 'profile_image', 'password1', 'password2',)
+        fields = ('username',  'last_name', 'first_name',  'second_name', 'email', 'phone_number', 'birth_date', 'gender', 'profile_image', 'password1', 'password2',)
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя пользователя*'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email*'}),
@@ -79,6 +79,5 @@ class ClientForm(UserCreationForm):
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(label='', max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя пользователя*', 'name':'username'}))
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль*', 'name':'password'}))
-
+    username = forms.CharField(label='', max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя пользователя*', 'name': 'username'}))
+    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль*', 'name': 'password'}))

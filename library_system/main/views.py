@@ -1,16 +1,66 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.views.generic import DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.core.paginator import Paginator
 from .forms import BookForm, CommentForm, BookFormEdit
-from .models import Book, Comment, Like
+from .models import Book, Genre, Like
 from django.contrib import messages
+from django.db.models import Count, Q
 
 def index(request):
-    books = Book.objects.order_by('-published_date')
-    context = {'books': books}
+    query = request.GET.get('q')  # Поисковый запрос
+    filter_by = request.GET.get('filter')  # Фильтр
+    genre_filter = request.GET.get('genre')  # Фильтр по жанру
+
+    # Базовый запрос для книг
+    books = Book.objects.all()
+
+    # Пример 1: Сложный запрос с Q (AND, OR, NOT)
+    # Книги, у которых название содержит запрос ИЛИ описание содержит запрос,
+    # НО жанр не относится к выбранному (если фильтр по жанру задан).
+    if query:
+        query_conditions = Q(title__icontains=query) | Q(description__icontains=query)
+        if genre_filter:
+            query_conditions &= ~Q(genres__id=genre_filter)
+        books = books.filter(query_conditions)
+
+    # Пример 2: Ещё один сложный запрос с Q (AND, OR, NOT)
+    # Книги, у которых:
+    # - Либо название содержит запрос,
+    # - Либо автор содержит запрос,
+    # - И жанр совпадает с выбранным (если задан).
+    if genre_filter and query:
+        advanced_filter = (Q(title__icontains=query) | Q(author__icontains=query)) & Q(genres__id=genre_filter)
+        books = books.filter(advanced_filter)
+
+    # Фильтрация по дополнительным критериям
+    if filter_by == 'author':
+        books = books.order_by('author')
+    elif filter_by == 'date':
+        books = books.order_by('-date')
+    elif filter_by == 'publisher':
+        books = books.order_by('publisher')
+    elif filter_by == 'likes':
+        books = books.annotate(likes_count=Count('like')).order_by('-likes_count')
+
+    # Пагинация
+    paginator = Paginator(books, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Все доступные жанры
+    genres = Genre.objects.all()
+
+    context = {
+        'page_obj': page_obj,
+        'query': query,
+        'filter_by': filter_by,
+        'genres': genres,
+        'selected_genre': genre_filter,  # Выбранный жанр
+    }
     return render(request, 'main/index.html', context)
+
 
 class BooksDetailView(DetailView):
     model = Book
@@ -59,11 +109,19 @@ def addBook(request):
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
+            # Сохраняем книгу, но не подтверждаем связывание жанров
             book = form.save(commit=False)
-            book.save()
+            book.save()  # Сохраняем книгу, чтобы она получила ID
+
+            # Теперь связываем жанры с книгой
+            genres = form.cleaned_data['genres']
+            book.genres.set(genres)  # Связываем жанры с книгой
+            book.save()  # Обязательно сохраняем изменения
+
             return redirect('home')
     else:
         form = BookForm()
+
     return render(request, 'main/addBook.html', {'form': form})
 
 def editBook(request, pk):
