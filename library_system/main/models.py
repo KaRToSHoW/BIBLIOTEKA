@@ -51,6 +51,13 @@ class Book(models.Model):
         if not self.pk and Book.objects.filter(title=self.title).exists():
             raise ValidationError({'title': 'Книга с таким названием уже существует.'})
 
+        # Валидация длины описания
+        if self.description and len(self.description) < 200:
+            raise ValidationError({'description': 'Описание не может быть длиннее 200 символов.'})
+
+        # Проверка на длину описания (например, минимум 20 символов)
+        if self.description and len(self.description) < 20:
+            raise ValidationError({'description': 'Описание книги должно быть не короче 20 символов.'})
 
 
 class Comment(models.Model):

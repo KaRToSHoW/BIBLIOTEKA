@@ -21,7 +21,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [AllowAny]  # Это позволяет доступ всем без аутентификации
+    permission_classes = [AllowAny]
 
     @action(methods=['POST'], detail=True)
     def add_comment(self, request, pk=None):

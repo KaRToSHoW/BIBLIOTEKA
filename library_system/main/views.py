@@ -140,8 +140,6 @@ def deleteBook(request, pk):
         return redirect('home')
     return render(request, 'main/confirm_delete.html', {'book': book})
 
-
-
 # Для консоли
 # from django.urls import reverse
 
