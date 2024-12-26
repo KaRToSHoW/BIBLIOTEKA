@@ -3,6 +3,8 @@ from django.views.generic import DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
+from django.urls import reverse, reverse_lazy
+from django.http import HttpResponseRedirect
 from .forms import BookForm, CommentForm, BookFormEdit
 from .models import Book, Genre, Like
 from django.contrib import messages
@@ -16,23 +18,18 @@ def index(request):
     # Базовый запрос для книг
     books = Book.objects.all()
 
-    # Пример 1: Сложный запрос с Q (AND, OR, NOT)
-    # Книги, у которых название содержит запрос ИЛИ описание содержит запрос,
-    # НО жанр не относится к выбранному (если фильтр по жанру задан).
-    if query:
-        query_conditions = Q(title__icontains=query) | Q(description__icontains=query)
-        if genre_filter:
-            query_conditions &= ~Q(genres__id=genre_filter)
-        books = books.filter(query_conditions)
-
-    # Пример 2: Ещё один сложный запрос с Q (AND, OR, NOT)
-    # Книги, у которых:
-    # - Либо название содержит запрос,
-    # - Либо автор содержит запрос,
-    # - И жанр совпадает с выбранным (если задан).
-    if genre_filter and query:
-        advanced_filter = (Q(title__icontains=query) | Q(author__icontains=query)) & Q(genres__id=genre_filter)
-        books = books.filter(advanced_filter)
+    if genre_filter:
+        if query:
+            # Фильтрация по жанру и поисковому запросу
+            books = books.filter(
+                Q(genres__id=genre_filter) & (Q(title__icontains=query) | Q(description__icontains=query))
+            )
+        else:
+            # Только фильтрация по жанру
+            books = books.filter(genres__id=genre_filter)
+    elif query:
+        # Только фильтрация по запросу
+        books = books.filter(Q(title__icontains=query) | Q(description__icontains=query))
 
     # Фильтрация по дополнительным критериям
     if filter_by == 'author':
@@ -88,7 +85,7 @@ class BooksDetailView(DetailView):
             comment.book = book
             comment.user = request.user
             comment.save()
-        return redirect('BooksDetail', pk=book.pk)
+        return redirect(reverse_lazy('BooksDetail', kwargs={'pk': book.pk}))
 
 @login_required
 def toggle_like(request, pk):
@@ -99,7 +96,8 @@ def toggle_like(request, pk):
         messages.success(request, f'You have unliked "{book.title}".')
     else:
         messages.success(request, f'You have liked "{book.title}".')
-    return redirect('BooksDetail', pk=pk)
+    url = reverse('BooksDetail', kwargs={'pk': book.pk})
+    return HttpResponseRedirect(url)
 
 
 def about(request):
@@ -116,7 +114,7 @@ def addBook(request):
             # Теперь связываем жанры с книгой
             genres = form.cleaned_data['genres']
             book.genres.set(genres)  # Связываем жанры с книгой
-            book.save()  # Обязательно сохраняем изменения
+            book.save()  # сохраняем изменения
 
             return redirect('home')
     else:
@@ -130,7 +128,7 @@ def editBook(request, pk):
         form = BookFormEdit(request.POST, request.FILES, instance=book)
         if form.is_valid():
             form.save()
-            return redirect('BooksDetail', pk=book.pk)
+            return redirect(reverse_lazy('BooksDetail', kwargs={'pk': book.pk}))
     else:
         form = BookFormEdit(instance=book)
     return render(request, 'main/edit_book.html', {'form': form, 'book': book})
@@ -141,3 +139,12 @@ def deleteBook(request, pk):
         book.delete()
         return redirect('home')
     return render(request, 'main/confirm_delete.html', {'book': book})
+
+
+
+# Для консоли
+# from django.urls import reverse
+
+# # Пример разрешения URL для страницы книги с id 1
+# url = reverse('BooksDetail', kwargs={'pk': 1})
+# print(url)

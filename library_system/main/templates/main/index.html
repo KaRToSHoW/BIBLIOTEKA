@@ -8,6 +8,7 @@
 <div class="container mx-auto mt-4">
     <!-- Форма поиска и фильтрации -->
     <form method="get" action="{% url 'home' %}" class="d-flex mb-4">
+        <input style='height:38px' type="text" name="q" class="form-control me-2" placeholder="Введите название или описание книги..." value="{{ query|default:'' }}">
         <!-- Выпадающий список фильтров -->
         <select name="filter" class="form-select me-2 mb-2">
             <option value="" {% if not filter_by %}selected{% endif %}>Все</option>
@@ -25,9 +26,7 @@
             </option>
             {% endfor %}
         </select>
-
-        <!-- Кнопка поиска -->
-        <button type="submit" class="btn btn-login fw-bold text-uppercase">Применить</button>
+        <button style='height:38px' type="submit" class="btn btn-login fw-bold text-uppercase">Применить</button>
     </form>
 </div>
 

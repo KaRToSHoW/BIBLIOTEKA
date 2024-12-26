@@ -30,7 +30,7 @@ class Book(models.Model):
     history = HistoricalRecords()
 
     class Meta:
-        verbose_name = 'Книга'
+        verbose_name = 'Книгу'
         verbose_name_plural = 'Книги'
 
     def __str__(self):
@@ -47,9 +47,10 @@ class Book(models.Model):
         if self.published_date and self.published_date > timezone.now().date():
             raise ValidationError({'published_date': 'Дата издания не может быть в будущем.'})
 
-        # Проверка на уникальность по названию
-        if Book.objects.filter(title=self.title).exists():
+        # Проверка на уникальность по названию только при создании
+        if not self.pk and Book.objects.filter(title=self.title).exists():
             raise ValidationError({'title': 'Книга с таким названием уже существует.'})
+
 
 
 class Comment(models.Model):
